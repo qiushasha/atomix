@@ -44,7 +44,6 @@ import io.atomix.primitive.service.AbstractPrimitiveService;
 import io.atomix.primitive.service.BackupInput;
 import io.atomix.primitive.service.BackupOutput;
 import io.atomix.primitive.service.Commit;
-import io.atomix.primitive.service.ServiceConfig;
 import io.atomix.primitive.service.ServiceExecutor;
 import io.atomix.primitive.session.PrimitiveSession;
 import io.atomix.utils.concurrent.Scheduled;
@@ -119,8 +118,7 @@ public class ConsistentMapService extends AbstractPrimitiveService {
   protected Map<TransactionId, TransactionScope> activeTransactions = Maps.newHashMap();
   protected long currentVersion;
 
-  public ConsistentMapService(ServiceConfig config) {
-    super(config);
+  public ConsistentMapService() {
     map = createMap();
   }
 

@@ -22,14 +22,16 @@ import io.atomix.primitive.PrimitiveManagementService;
 import io.atomix.primitive.PrimitiveType;
 import io.atomix.primitive.resource.PrimitiveResource;
 import io.atomix.primitive.service.PrimitiveService;
-import io.atomix.primitive.service.ServiceConfig;
+
+import java.util.function.Function;
+import java.util.function.Supplier;
 
 import static com.google.common.base.MoreObjects.toStringHelper;
 
 /**
  * Distributed lock primitive type.
  */
-public class DistributedLockType implements PrimitiveType<DistributedLockBuilder, DistributedLockConfig, DistributedLock, ServiceConfig> {
+public class DistributedLockType implements PrimitiveType<DistributedLockBuilder, DistributedLockConfig, DistributedLock> {
   private static final String NAME = "LOCK";
 
   /**
@@ -47,14 +49,13 @@ public class DistributedLockType implements PrimitiveType<DistributedLockBuilder
   }
 
   @Override
-  public PrimitiveService newService(ServiceConfig config) {
-    return new DistributedLockService(config);
+  public Supplier<PrimitiveService> serviceFactory() {
+    return DistributedLockService::new;
   }
 
   @Override
-  @SuppressWarnings("unchecked")
-  public PrimitiveResource newResource(DistributedLock primitive) {
-    return new DistributedLockResource(primitive.async());
+  public Function<DistributedLock, PrimitiveResource> resourceFactory() {
+    return DistributedLockResource::new;
   }
 
   @Override

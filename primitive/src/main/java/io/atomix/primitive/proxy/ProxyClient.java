@@ -16,7 +16,8 @@
 package io.atomix.primitive.proxy;
 
 import io.atomix.primitive.PrimitiveType;
-import io.atomix.primitive.service.ServiceConfig;
+import io.atomix.primitive.protocol.PrimitiveProtocol;
+import io.atomix.primitive.proxy.PartitionProxy;
 
 /**
  * Proxy client.
@@ -26,11 +27,10 @@ public interface ProxyClient {
   /**
    * Returns a new proxy builder for the given primitive type.
    *
-   * @param primitiveName the proxy name
-   * @param primitiveType the type for which to return a new proxy builder
-   * @param serviceConfig the primitive service configuration
+   * @param primitiveName     the proxy name
+   * @param primitiveType     the type for which to return a new proxy builder
    * @return a new proxy builder for the given primitive type
    */
-  PartitionProxy.Builder proxyBuilder(String primitiveName, PrimitiveType primitiveType, ServiceConfig serviceConfig);
+  PartitionProxy.Builder proxyBuilder(String primitiveName, PrimitiveType primitiveType);
 
 }

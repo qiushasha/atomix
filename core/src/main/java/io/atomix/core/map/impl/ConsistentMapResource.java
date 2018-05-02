@@ -16,6 +16,7 @@
 package io.atomix.core.map.impl;
 
 import io.atomix.core.map.AsyncConsistentMap;
+import io.atomix.core.map.ConsistentMap;
 import io.atomix.primitive.resource.PrimitiveResource;
 import io.atomix.utils.time.Versioned;
 import org.slf4j.Logger;
@@ -37,20 +38,27 @@ import javax.ws.rs.core.Response;
 /**
  * Consistent map resource.
  */
-public class ConsistentMapResource implements PrimitiveResource {
+public class ConsistentMapResource extends PrimitiveResource<ConsistentMap<String, String>> {
   private static final Logger LOGGER = LoggerFactory.getLogger(ConsistentMapResource.class);
 
-  private final AsyncConsistentMap<String, String> map;
+  public ConsistentMapResource(ConsistentMap<String, String> map) {
+    super(map);
+  }
 
-  public ConsistentMapResource(AsyncConsistentMap<String, String> map) {
-    this.map = map;
+  /**
+   * Returns the consistent map primitive.
+   *
+   * @return the consistent map primitive
+   */
+  private AsyncConsistentMap<String, String> map() {
+    return primitive.async();
   }
 
   @GET
   @Path("/{key}")
   @Produces(MediaType.APPLICATION_JSON)
   public void get(@PathParam("key") String key, @Suspended AsyncResponse response) {
-    map.get(key).whenComplete((result, error) -> {
+    map().get(key).whenComplete((result, error) -> {
       if (error == null) {
         response.resume(Response.ok(result != null ? new VersionedResult(result) : null).build());
       } else {
@@ -65,7 +73,7 @@ public class ConsistentMapResource implements PrimitiveResource {
   @Consumes(MediaType.TEXT_PLAIN)
   @Produces(MediaType.APPLICATION_JSON)
   public void put(@PathParam("key") String key, String value, @Suspended AsyncResponse response) {
-    map.put(key, value).whenComplete((result, error) -> {
+    map().put(key, value).whenComplete((result, error) -> {
       if (error == null) {
         response.resume(Response.ok(result != null ? new VersionedResult(result) : null).build());
       } else {
@@ -79,7 +87,7 @@ public class ConsistentMapResource implements PrimitiveResource {
   @Path("/{key}")
   @Produces(MediaType.APPLICATION_JSON)
   public void remove(@PathParam("key") String key, @Suspended AsyncResponse response) {
-    map.remove(key).whenComplete((result, error) -> {
+    map().remove(key).whenComplete((result, error) -> {
       if (error == null) {
         response.resume(Response.ok(result != null ? new VersionedResult(result) : null).build());
       } else {
@@ -93,7 +101,7 @@ public class ConsistentMapResource implements PrimitiveResource {
   @Path("/keys")
   @Produces(MediaType.APPLICATION_JSON)
   public void keys(@Suspended AsyncResponse response) {
-    map.keySet().whenComplete((result, error) -> {
+    map().keySet().whenComplete((result, error) -> {
       if (error == null) {
         response.resume(Response.ok(result).build());
       } else {
@@ -107,7 +115,7 @@ public class ConsistentMapResource implements PrimitiveResource {
   @Path("/size")
   @Produces(MediaType.APPLICATION_JSON)
   public void size(@Suspended AsyncResponse response) {
-    map.size().whenComplete((result, error) -> {
+    map().size().whenComplete((result, error) -> {
       if (error == null) {
         response.resume(Response.ok(result).build());
       } else {
@@ -120,7 +128,7 @@ public class ConsistentMapResource implements PrimitiveResource {
   @POST
   @Path("/clear")
   public void clear(@Suspended AsyncResponse response) {
-    map.clear().whenComplete((result, error) -> {
+    map().clear().whenComplete((result, error) -> {
       if (error == null) {
         response.resume(Response.noContent().build());
       } else {

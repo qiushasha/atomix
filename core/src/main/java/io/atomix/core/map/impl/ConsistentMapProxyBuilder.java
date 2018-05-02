@@ -22,7 +22,6 @@ import io.atomix.core.map.ConsistentMapBuilder;
 import io.atomix.core.map.ConsistentMapConfig;
 import io.atomix.primitive.PrimitiveManagementService;
 import io.atomix.primitive.proxy.PrimitiveProxy;
-import io.atomix.primitive.service.ServiceConfig;
 import io.atomix.utils.serializer.Serializer;
 
 import java.util.concurrent.CompletableFuture;
@@ -44,7 +43,6 @@ public class ConsistentMapProxyBuilder<K, V> extends ConsistentMapBuilder<K, V> 
     PrimitiveProxy proxy = protocol().newProxy(
         name(),
         primitiveType(),
-        new ServiceConfig(),
         managementService.getPartitionService());
     return new ConsistentMapProxy(proxy, managementService.getPrimitiveRegistry())
         .connect()

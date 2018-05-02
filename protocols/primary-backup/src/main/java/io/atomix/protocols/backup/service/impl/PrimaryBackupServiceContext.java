@@ -29,7 +29,6 @@ import io.atomix.primitive.partition.PrimaryElection;
 import io.atomix.primitive.partition.PrimaryElectionEventListener;
 import io.atomix.primitive.partition.PrimaryTerm;
 import io.atomix.primitive.service.PrimitiveService;
-import io.atomix.primitive.service.ServiceConfig;
 import io.atomix.primitive.service.ServiceContext;
 import io.atomix.primitive.session.PrimitiveSession;
 import io.atomix.primitive.session.SessionId;
@@ -53,7 +52,6 @@ import io.atomix.utils.concurrent.ComposableFuture;
 import io.atomix.utils.concurrent.ThreadContext;
 import io.atomix.utils.logging.ContextualLoggerFactory;
 import io.atomix.utils.logging.LoggerContext;
-import io.atomix.utils.serializer.Serializer;
 import io.atomix.utils.time.LogicalClock;
 import io.atomix.utils.time.LogicalTimestamp;
 import io.atomix.utils.time.WallClock;
@@ -76,7 +74,6 @@ public class PrimaryBackupServiceContext implements ServiceContext {
   private final String serverName;
   private final PrimitiveId primitiveId;
   private final PrimitiveType primitiveType;
-  private final ServiceConfig serviceConfig;
   private final PrimitiveDescriptor descriptor;
   private final PrimitiveService service;
   private final PrimaryBackupServiceSessions sessions = new PrimaryBackupServiceSessions();
@@ -110,11 +107,10 @@ public class PrimaryBackupServiceContext implements ServiceContext {
   private final ClusterMembershipEventListener membershipEventListener = this::handleClusterEvent;
   private final PrimaryElectionEventListener primaryElectionListener = event -> changeRole(event.term());
 
-  @SuppressWarnings("unchecked")
   public PrimaryBackupServiceContext(
       String serverName,
       PrimitiveId primitiveId,
-      PrimitiveType primitiveType,
+      PrimitiveType<?, ?, ?> primitiveType,
       PrimitiveDescriptor descriptor,
       ThreadContext threadContext,
       ClusterMembershipService clusterMembershipService,
@@ -125,9 +121,8 @@ public class PrimaryBackupServiceContext implements ServiceContext {
     this.serverName = checkNotNull(serverName);
     this.primitiveId = checkNotNull(primitiveId);
     this.primitiveType = checkNotNull(primitiveType);
-    this.serviceConfig = Serializer.using(primitiveType.namespace()).decode(descriptor.config());
     this.descriptor = checkNotNull(descriptor);
-    this.service = primitiveType.newService(serviceConfig);
+    this.service = primitiveType.serviceFactory().get();
     this.threadContext = checkNotNull(threadContext);
     this.clusterMembershipService = checkNotNull(clusterMembershipService);
     this.memberGroupService = checkNotNull(memberGroupService);
@@ -205,12 +200,6 @@ public class PrimaryBackupServiceContext implements ServiceContext {
   @Override
   public PrimitiveType serviceType() {
     return primitiveType;
-  }
-
-  @Override
-  @SuppressWarnings("unchecked")
-  public <C extends ServiceConfig> C serviceConfig() {
-    return (C) serviceConfig;
   }
 
   @Override

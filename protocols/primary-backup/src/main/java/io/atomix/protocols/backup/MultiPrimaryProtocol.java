@@ -25,7 +25,6 @@ import io.atomix.primitive.protocol.PrimitiveProtocol;
 import io.atomix.primitive.proxy.PartitionProxy;
 import io.atomix.primitive.proxy.PrimitiveProxy;
 import io.atomix.primitive.proxy.impl.PartitionedPrimitiveProxy;
-import io.atomix.primitive.service.ServiceConfig;
 import io.atomix.protocols.backup.partition.PrimaryBackupPartition;
 
 import java.time.Duration;
@@ -90,11 +89,11 @@ public class MultiPrimaryProtocol implements PrimitiveProtocol {
   }
 
   @Override
-  public PrimitiveProxy newProxy(String primitiveName, PrimitiveType primitiveType, ServiceConfig serviceConfig, PartitionService partitionService) {
+  public PrimitiveProxy newProxy(String primitiveName, PrimitiveType primitiveType, PartitionService partitionService) {
     Collection<PartitionProxy> partitions = partitionService.<PrimaryBackupPartition>getPartitionGroup(this)
         .getPartitions()
         .stream()
-        .map(partition -> partition.getProxyClient().proxyBuilder(primitiveName, primitiveType, serviceConfig)
+        .map(partition -> partition.getProxyClient().proxyBuilder(primitiveName, primitiveType)
             .withConsistency(config.getConsistency())
             .withReplication(config.getReplication())
             .withRecovery(config.getRecovery())

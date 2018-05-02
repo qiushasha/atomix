@@ -20,7 +20,8 @@ import io.atomix.primitive.PrimitiveConfig;
 import io.atomix.primitive.PrimitiveManagementService;
 import io.atomix.primitive.PrimitiveType;
 import io.atomix.primitive.service.PrimitiveService;
-import io.atomix.primitive.service.ServiceConfig;
+
+import java.util.function.Supplier;
 
 /**
  * Test primitive type.
@@ -32,8 +33,8 @@ public class TestPrimitiveType implements PrimitiveType {
   }
 
   @Override
-  public PrimitiveService newService(ServiceConfig config) {
-    throw new UnsupportedOperationException();
+  public Supplier<PrimitiveService> serviceFactory() {
+    return null;
   }
 
   @Override

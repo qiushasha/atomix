@@ -31,15 +31,10 @@ import org.slf4j.Logger;
 /**
  * Raft service.
  */
-public abstract class AbstractPrimitiveService<C extends ServiceConfig> implements PrimitiveService {
-  private final C config;
+public abstract class AbstractPrimitiveService implements PrimitiveService {
   private Logger log;
   private ServiceContext context;
   private ServiceExecutor executor;
-
-  protected AbstractPrimitiveService(C config) {
-    this.config = config;
-  }
 
   /**
    * Encodes the given object using the configured {@link #serializer()}.
@@ -130,15 +125,6 @@ public abstract class AbstractPrimitiveService<C extends ServiceConfig> implemen
    */
   protected String getServiceName() {
     return context.serviceName();
-  }
-
-  /**
-   * Returns the service configuration.
-   *
-   * @return the service configuration
-   */
-  protected C getServiceConfig() {
-    return config;
   }
 
   /**

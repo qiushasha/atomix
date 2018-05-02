@@ -29,7 +29,6 @@ import io.atomix.primitive.PrimitiveTypes;
 import io.atomix.primitive.partition.PartitionService;
 import io.atomix.primitive.protocol.PrimitiveProtocol;
 import io.atomix.primitive.proxy.PrimitiveProxy;
-import io.atomix.primitive.service.ServiceConfig;
 import io.atomix.utils.serializer.KryoNamespaces;
 import io.atomix.utils.serializer.Serializer;
 
@@ -122,7 +121,6 @@ public class CorePrimitiveRegistry implements ManagedPrimitiveRegistry {
     PrimitiveProxy proxy = protocol.newProxy(
         "primitives",
         ConsistentMapType.instance(),
-        new ServiceConfig(),
         partitionService);
     return proxy.connect()
         .thenApply(v -> {

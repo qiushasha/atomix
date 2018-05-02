@@ -17,7 +17,6 @@ package io.atomix.core.multimap.impl;
 
 import io.atomix.core.multimap.impl.ConsistentSetMultimapOperations.Get;
 import io.atomix.core.multimap.impl.ConsistentSetMultimapOperations.Put;
-import io.atomix.primitive.service.ServiceConfig;
 import io.atomix.primitive.service.impl.DefaultBackupInput;
 import io.atomix.primitive.service.impl.DefaultBackupOutput;
 import io.atomix.primitive.service.impl.DefaultCommit;
@@ -45,7 +44,7 @@ public class ConsistentSetMultimapServiceTest {
   @Test
   @SuppressWarnings("unchecked")
   public void testSnapshot() throws Exception {
-    ConsistentSetMultimapService service = new ConsistentSetMultimapService(new ServiceConfig());
+    ConsistentSetMultimapService service = new ConsistentSetMultimapService();
     service.put(new DefaultCommit<>(
         2,
         PUT,
@@ -57,7 +56,7 @@ public class ConsistentSetMultimapServiceTest {
     Buffer buffer = HeapBuffer.allocate();
     service.backup(new DefaultBackupOutput(buffer, service.serializer()));
 
-    service = new ConsistentSetMultimapService(new ServiceConfig());
+    service = new ConsistentSetMultimapService();
     service.restore(new DefaultBackupInput(buffer.flip(), service.serializer()));
 
     Versioned<Collection<? extends byte[]>> value = service.get(new DefaultCommit<>(

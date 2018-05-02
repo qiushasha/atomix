@@ -17,6 +17,7 @@ package io.atomix.core.queue.impl;
 
 import com.google.common.util.concurrent.MoreExecutors;
 import io.atomix.core.queue.AsyncWorkQueue;
+import io.atomix.core.queue.WorkQueue;
 import io.atomix.core.utils.EventLog;
 import io.atomix.core.utils.EventManager;
 import io.atomix.primitive.resource.PrimitiveResource;
@@ -38,19 +39,26 @@ import java.util.function.Consumer;
 /**
  * Work queue resource.
  */
-public class WorkQueueResource implements PrimitiveResource {
+public class WorkQueueResource extends PrimitiveResource<WorkQueue<String>> {
   private static final Logger LOGGER = LoggerFactory.getLogger(WorkQueueResource.class);
 
-  private final AsyncWorkQueue<String> workQueue;
+  public WorkQueueResource(WorkQueue<String> workQueue) {
+    super(workQueue);
+  }
 
-  public WorkQueueResource(AsyncWorkQueue<String> workQueue) {
-    this.workQueue = workQueue;
+  /**
+   * Returns the work queue primitive.
+   *
+   * @return the work queue primitive
+   */
+  private AsyncWorkQueue<String> workQueue() {
+    return primitive.async();
   }
 
   @POST
   @Consumes(MediaType.TEXT_PLAIN)
   public void add(String item, @Suspended AsyncResponse response) {
-    workQueue.addOne(item).whenComplete((result, error) -> {
+    workQueue().addOne(item).whenComplete((result, error) -> {
       if (error == null) {
         response.resume(Response.ok().build());
       } else {
@@ -64,9 +72,9 @@ public class WorkQueueResource implements PrimitiveResource {
   @Produces(MediaType.APPLICATION_JSON)
   public void take(@Context EventManager events, @Suspended AsyncResponse response) {
     EventLog<Consumer<String>, String> eventLog = events.getOrCreateEventLog(
-        AsyncWorkQueue.class, workQueue.name(), l -> e -> l.addEvent(e));
+        AsyncWorkQueue.class, workQueue().name(), l -> e -> l.addEvent(e));
     if (eventLog.open()) {
-      workQueue.registerTaskProcessor(eventLog.listener(), 1, MoreExecutors.directExecutor())
+      workQueue().registerTaskProcessor(eventLog.listener(), 1, MoreExecutors.directExecutor())
           .whenComplete((result, error) -> {
             if (error == null) {
               takeTask(eventLog, response);

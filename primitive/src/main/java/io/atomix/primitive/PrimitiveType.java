@@ -17,18 +17,16 @@ package io.atomix.primitive;
 
 import io.atomix.primitive.resource.PrimitiveResource;
 import io.atomix.primitive.service.PrimitiveService;
-import io.atomix.primitive.service.ServiceConfig;
 import io.atomix.utils.Generics;
 import io.atomix.utils.Identifier;
-import io.atomix.utils.serializer.KryoNamespace;
-import io.atomix.utils.serializer.KryoNamespaces;
-import io.atomix.utils.serializer.Namespace;
+
+import java.util.function.Function;
+import java.util.function.Supplier;
 
 /**
  * Raft service type.
  */
-public interface PrimitiveType<B extends DistributedPrimitiveBuilder<B, C, P>, C extends PrimitiveConfig<C>, P extends DistributedPrimitive, S extends ServiceConfig>
-    extends Identifier<String> {
+public interface PrimitiveType<B extends DistributedPrimitiveBuilder<B, C, P>, C extends PrimitiveConfig, P extends DistributedPrimitive> extends Identifier<String> {
 
   /**
    * Returns the primitive type name.
@@ -54,7 +52,7 @@ public interface PrimitiveType<B extends DistributedPrimitiveBuilder<B, C, P>, C
    * @return the primitive type configuration class
    */
   @SuppressWarnings("unchecked")
-  default Class<? extends PrimitiveConfig> primitiveConfigClass() {
+  default Class<? extends PrimitiveConfig> configClass() {
     return (Class<? extends PrimitiveConfig>) Generics.getGenericInterfaceType(this, PrimitiveType.class, 1);
   }
 
@@ -69,42 +67,18 @@ public interface PrimitiveType<B extends DistributedPrimitiveBuilder<B, C, P>, C
   }
 
   /**
-   * Returns the service configuration class.
-   *
-   * @return the service configuration class
-   */
-  @SuppressWarnings("unchecked")
-  default Class<? extends ServiceConfig> serviceConfigClass() {
-    return (Class<? extends ServiceConfig>) Generics.getGenericInterfaceType(this, ServiceConfig.class, 3);
-  }
-
-  /**
-   * Returns the primitive namespace.
-   *
-   * @return the primitive namespace
-   */
-  default Namespace namespace() {
-    return KryoNamespace.builder()
-        .register(KryoNamespaces.BASIC)
-        .register(serviceConfigClass())
-        .build();
-  }
-
-  /**
    * Returns the primitive service factory.
    *
-   * @param config the primitive service configuration
    * @return the primitive service factory.
    */
-  PrimitiveService newService(S config);
+  Supplier<PrimitiveService> serviceFactory();
 
   /**
    * Returns the primitive resource factory.
    *
-   * @param primitive the primitive instance
    * @return the primitive resource factory
    */
-  default PrimitiveResource newResource(P primitive) {
+  default Function<P, PrimitiveResource> resourceFactory() {
     return null;
   }
 

@@ -33,7 +33,6 @@ import io.atomix.primitive.service.BackupInput;
 import io.atomix.primitive.service.BackupOutput;
 import io.atomix.primitive.service.Commit;
 import io.atomix.primitive.service.PrimitiveService;
-import io.atomix.primitive.service.ServiceConfig;
 import io.atomix.primitive.service.ServiceExecutor;
 import io.atomix.primitive.session.PrimitiveSession;
 import io.atomix.primitive.session.SessionMetadata;
@@ -83,6 +82,7 @@ import java.util.concurrent.TimeoutException;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.function.Consumer;
+import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
 import static io.atomix.primitive.operation.PrimitiveOperation.operation;
@@ -1267,7 +1267,7 @@ public class RaftTest extends ConcurrentTestCase {
    * Creates a test session.
    */
   private PartitionProxy createSession(RaftClient client, ReadConsistency consistency) throws Exception {
-    return client.proxyBuilder("test", TestPrimitiveType.INSTANCE, new ServiceConfig())
+    return client.proxyBuilder("test", TestPrimitiveType.INSTANCE)
         .withReadConsistency(consistency)
         .withMinTimeout(Duration.ofMillis(250))
         .withMaxTimeout(Duration.ofSeconds(5))
@@ -1347,8 +1347,8 @@ public class RaftTest extends ConcurrentTestCase {
     }
 
     @Override
-    public PrimitiveService newService(ServiceConfig config) {
-      return new TestPrimitiveService(config);
+    public Supplier<PrimitiveService> serviceFactory() {
+      return TestPrimitiveService::new;
     }
 
     @Override
@@ -1368,10 +1368,6 @@ public class RaftTest extends ConcurrentTestCase {
   public static class TestPrimitiveService extends AbstractPrimitiveService {
     private Commit<Void> expire;
     private Commit<Void> close;
-
-    public TestPrimitiveService(ServiceConfig config) {
-      super(config);
-    }
 
     @Override
     public Serializer serializer() {

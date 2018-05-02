@@ -15,7 +15,6 @@
  */
 package io.atomix.core.counter;
 
-import io.atomix.core.counter.impl.AtomicCounterOperations;
 import io.atomix.core.counter.impl.AtomicCounterProxyBuilder;
 import io.atomix.core.counter.impl.AtomicCounterResource;
 import io.atomix.core.counter.impl.AtomicCounterService;
@@ -23,22 +22,17 @@ import io.atomix.primitive.PrimitiveManagementService;
 import io.atomix.primitive.PrimitiveType;
 import io.atomix.primitive.resource.PrimitiveResource;
 import io.atomix.primitive.service.PrimitiveService;
-import io.atomix.primitive.service.ServiceConfig;
-import io.atomix.utils.serializer.KryoNamespace;
-import io.atomix.utils.serializer.KryoNamespaces;
-import io.atomix.utils.serializer.Namespace;
+
+import java.util.function.Function;
+import java.util.function.Supplier;
 
 import static com.google.common.base.MoreObjects.toStringHelper;
 
 /**
  * Atomic counter primitive type.
  */
-public class AtomicCounterType implements PrimitiveType<AtomicCounterBuilder, AtomicCounterConfig, AtomicCounter, ServiceConfig> {
+public class AtomicCounterType implements PrimitiveType<AtomicCounterBuilder, AtomicCounterConfig, AtomicCounter> {
   private static final String NAME = "COUNTER";
-  private static final Namespace NAMESPACE = KryoNamespace.builder()
-      .register(KryoNamespaces.BASIC)
-      .register(AtomicCounterOperations.NAMESPACE)
-      .build();
 
   /**
    * Returns a new atomic counter type.
@@ -55,13 +49,13 @@ public class AtomicCounterType implements PrimitiveType<AtomicCounterBuilder, At
   }
 
   @Override
-  public PrimitiveService newService(ServiceConfig config) {
-    return new AtomicCounterService(config);
+  public Supplier<PrimitiveService> serviceFactory() {
+    return AtomicCounterService::new;
   }
 
   @Override
-  public PrimitiveResource newResource(AtomicCounter primitive) {
-    return new AtomicCounterResource(primitive.async());
+  public Function<AtomicCounter, PrimitiveResource> resourceFactory() {
+    return AtomicCounterResource::new;
   }
 
   @Override

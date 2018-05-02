@@ -22,14 +22,16 @@ import io.atomix.primitive.PrimitiveManagementService;
 import io.atomix.primitive.PrimitiveType;
 import io.atomix.primitive.resource.PrimitiveResource;
 import io.atomix.primitive.service.PrimitiveService;
-import io.atomix.primitive.service.ServiceConfig;
+
+import java.util.function.Function;
+import java.util.function.Supplier;
 
 import static com.google.common.base.MoreObjects.toStringHelper;
 
 /**
  * Leader elector primitive type.
  */
-public class LeaderElectionType<T> implements PrimitiveType<LeaderElectionBuilder<T>, LeaderElectionConfig, LeaderElection<T>, ServiceConfig> {
+public class LeaderElectionType<T> implements PrimitiveType<LeaderElectionBuilder<T>, LeaderElectionConfig, LeaderElection<T>> {
   private static final String NAME = "LEADER_ELECTION";
 
   /**
@@ -48,14 +50,14 @@ public class LeaderElectionType<T> implements PrimitiveType<LeaderElectionBuilde
   }
 
   @Override
-  public PrimitiveService newService(ServiceConfig config) {
-    return new LeaderElectionService(config);
+  public Supplier<PrimitiveService> serviceFactory() {
+    return LeaderElectionService::new;
   }
 
   @Override
   @SuppressWarnings("unchecked")
-  public PrimitiveResource newResource(LeaderElection<T> primitive) {
-    return new LeaderElectionResource((AsyncLeaderElection<String>) primitive.async());
+  public Function<LeaderElection<T>, PrimitiveResource> resourceFactory() {
+    return election -> new LeaderElectionResource((LeaderElection<String>) election);
   }
 
   @Override

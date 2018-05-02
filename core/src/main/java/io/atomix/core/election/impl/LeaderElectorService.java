@@ -38,7 +38,6 @@ import io.atomix.primitive.service.AbstractPrimitiveService;
 import io.atomix.primitive.service.BackupInput;
 import io.atomix.primitive.service.BackupOutput;
 import io.atomix.primitive.service.Commit;
-import io.atomix.primitive.service.ServiceConfig;
 import io.atomix.primitive.service.ServiceExecutor;
 import io.atomix.primitive.session.PrimitiveSession;
 import io.atomix.utils.misc.ArraySizeHashPrinter;
@@ -85,10 +84,6 @@ public class LeaderElectorService extends AbstractPrimitiveService {
   private Map<String, AtomicLong> termCounters = new HashMap<>();
   private Map<String, ElectionState> elections = new HashMap<>();
   private Map<Long, PrimitiveSession> listeners = new LinkedHashMap<>();
-
-  public LeaderElectorService(ServiceConfig config) {
-    super(config);
-  }
 
   @Override
   public Serializer serializer() {

@@ -23,7 +23,6 @@ import io.atomix.core.multimap.ConsistentMultimapBuilder;
 import io.atomix.core.multimap.ConsistentMultimapConfig;
 import io.atomix.primitive.PrimitiveManagementService;
 import io.atomix.primitive.proxy.PrimitiveProxy;
-import io.atomix.primitive.service.ServiceConfig;
 import io.atomix.utils.serializer.Serializer;
 
 import java.util.concurrent.CompletableFuture;
@@ -42,7 +41,6 @@ public class ConsistentMultimapProxyBuilder<K, V> extends ConsistentMultimapBuil
     PrimitiveProxy proxy = protocol().newProxy(
         name(),
         primitiveType(),
-        new ServiceConfig(),
         managementService.getPartitionService());
     return new ConsistentSetMultimapProxy(proxy, managementService.getPrimitiveRegistry())
         .connect()

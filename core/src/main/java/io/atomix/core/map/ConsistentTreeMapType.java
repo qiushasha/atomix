@@ -20,7 +20,8 @@ import io.atomix.core.map.impl.ConsistentTreeMapService;
 import io.atomix.primitive.PrimitiveManagementService;
 import io.atomix.primitive.PrimitiveType;
 import io.atomix.primitive.service.PrimitiveService;
-import io.atomix.primitive.service.ServiceConfig;
+
+import java.util.function.Supplier;
 
 import static com.google.common.base.MoreObjects.toStringHelper;
 
@@ -28,7 +29,7 @@ import static com.google.common.base.MoreObjects.toStringHelper;
  * Consistent tree map primitive type.
  */
 public class ConsistentTreeMapType<V>
-    implements PrimitiveType<ConsistentTreeMapBuilder<V>, ConsistentTreeMapConfig, ConsistentTreeMap<V>, ServiceConfig> {
+    implements PrimitiveType<ConsistentTreeMapBuilder<V>, ConsistentTreeMapConfig, ConsistentTreeMap<V>> {
   private static final String NAME = "CONSISTENT_TREEMAP";
 
   /**
@@ -47,8 +48,8 @@ public class ConsistentTreeMapType<V>
   }
 
   @Override
-  public PrimitiveService newService(ServiceConfig config) {
-    return new ConsistentTreeMapService(config);
+  public Supplier<PrimitiveService> serviceFactory() {
+    return ConsistentTreeMapService::new;
   }
 
   @Override

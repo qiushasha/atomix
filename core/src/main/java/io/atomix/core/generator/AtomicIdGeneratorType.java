@@ -22,14 +22,16 @@ import io.atomix.primitive.PrimitiveManagementService;
 import io.atomix.primitive.PrimitiveType;
 import io.atomix.primitive.resource.PrimitiveResource;
 import io.atomix.primitive.service.PrimitiveService;
-import io.atomix.primitive.service.ServiceConfig;
+
+import java.util.function.Function;
+import java.util.function.Supplier;
 
 import static com.google.common.base.MoreObjects.toStringHelper;
 
 /**
  * Atomic ID generator primitive type.
  */
-public class AtomicIdGeneratorType implements PrimitiveType<AtomicIdGeneratorBuilder, AtomicIdGeneratorConfig, AtomicIdGenerator, ServiceConfig> {
+public class AtomicIdGeneratorType implements PrimitiveType<AtomicIdGeneratorBuilder, AtomicIdGeneratorConfig, AtomicIdGenerator> {
   private static final String NAME = "ID_GENERATOR";
 
   /**
@@ -47,13 +49,13 @@ public class AtomicIdGeneratorType implements PrimitiveType<AtomicIdGeneratorBui
   }
 
   @Override
-  public PrimitiveService newService(ServiceConfig config) {
-    return new AtomicCounterService(config);
+  public Supplier<PrimitiveService> serviceFactory() {
+    return AtomicCounterService::new;
   }
 
   @Override
-  public PrimitiveResource newResource(AtomicIdGenerator primitive) {
-    return new AtomicIdGeneratorResource(primitive.async());
+  public Function<AtomicIdGenerator, PrimitiveResource> resourceFactory() {
+    return AtomicIdGeneratorResource::new;
   }
 
   @Override

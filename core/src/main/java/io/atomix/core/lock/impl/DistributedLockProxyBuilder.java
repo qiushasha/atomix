@@ -21,7 +21,6 @@ import io.atomix.core.lock.DistributedLockBuilder;
 import io.atomix.core.lock.DistributedLockConfig;
 import io.atomix.primitive.PrimitiveManagementService;
 import io.atomix.primitive.proxy.PrimitiveProxy;
-import io.atomix.primitive.service.ServiceConfig;
 
 import java.util.concurrent.CompletableFuture;
 
@@ -39,7 +38,6 @@ public class DistributedLockProxyBuilder extends DistributedLockBuilder {
     PrimitiveProxy proxy = protocol().newProxy(
         name(),
         primitiveType(),
-        new ServiceConfig(),
         managementService.getPartitionService());
     return new DistributedLockProxy(proxy, managementService.getPrimitiveRegistry(), managementService.getExecutorService())
         .connect()

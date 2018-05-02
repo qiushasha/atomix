@@ -23,7 +23,6 @@ import io.atomix.primitive.proxy.PartitionProxy;
 import io.atomix.primitive.proxy.impl.BlockingAwarePartitionProxy;
 import io.atomix.primitive.proxy.impl.RecoveringPartitionProxy;
 import io.atomix.primitive.proxy.impl.RetryingPartitionProxy;
-import io.atomix.primitive.service.ServiceConfig;
 import io.atomix.protocols.raft.RaftClient;
 import io.atomix.protocols.raft.RaftMetadataClient;
 import io.atomix.protocols.raft.protocol.RaftClientProtocol;
@@ -125,7 +124,7 @@ public class DefaultRaftClient implements RaftClient {
   }
 
   @Override
-  public RaftProxy.Builder proxyBuilder(String primitiveName, PrimitiveType primitiveType, ServiceConfig serviceConfig) {
+  public RaftProxy.Builder proxyBuilder(String primitiveName, PrimitiveType primitiveType) {
     return new RaftProxy.Builder() {
       @Override
       public PartitionProxy build() {
@@ -133,7 +132,6 @@ public class DefaultRaftClient implements RaftClient {
         Supplier<PartitionProxy> proxyFactory = () -> new DefaultRaftProxy(
             primitiveName,
             primitiveType,
-            serviceConfig,
             partitionId,
             DefaultRaftClient.this.protocol,
             selectorManager,

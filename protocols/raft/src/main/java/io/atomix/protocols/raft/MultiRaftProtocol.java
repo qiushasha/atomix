@@ -23,7 +23,6 @@ import io.atomix.primitive.protocol.PrimitiveProtocol;
 import io.atomix.primitive.proxy.PartitionProxy;
 import io.atomix.primitive.proxy.PrimitiveProxy;
 import io.atomix.primitive.proxy.impl.PartitionedPrimitiveProxy;
-import io.atomix.primitive.service.ServiceConfig;
 import io.atomix.protocols.raft.partition.RaftPartition;
 import io.atomix.protocols.raft.proxy.CommunicationStrategy;
 
@@ -89,11 +88,11 @@ public class MultiRaftProtocol implements PrimitiveProtocol {
   }
 
   @Override
-  public PrimitiveProxy newProxy(String primitiveName, PrimitiveType primitiveType, ServiceConfig serviceConfig, PartitionService partitionService) {
+  public PrimitiveProxy newProxy(String primitiveName, PrimitiveType primitiveType, PartitionService partitionService) {
     Collection<PartitionProxy> partitions = partitionService.<RaftPartition>getPartitionGroup(this)
         .getPartitions()
         .stream()
-        .map(partition -> partition.getProxyClient().proxyBuilder(primitiveName, primitiveType, serviceConfig)
+        .map(partition -> partition.getProxyClient().proxyBuilder(primitiveName, primitiveType)
             .withMinTimeout(config.getMinTimeout())
             .withMaxTimeout(config.getMaxTimeout())
             .withReadConsistency(config.getReadConsistency())

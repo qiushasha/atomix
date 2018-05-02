@@ -21,7 +21,6 @@ import io.atomix.core.map.AtomicCounterMapBuilder;
 import io.atomix.core.map.AtomicCounterMapConfig;
 import io.atomix.primitive.PrimitiveManagementService;
 import io.atomix.primitive.proxy.PrimitiveProxy;
-import io.atomix.primitive.service.ServiceConfig;
 import io.atomix.utils.serializer.Serializer;
 
 import java.util.concurrent.CompletableFuture;
@@ -40,7 +39,6 @@ public class AtomicCounterMapProxyBuilder<K> extends AtomicCounterMapBuilder<K> 
     PrimitiveProxy proxy = protocol().newProxy(
         name(),
         primitiveType(),
-        new ServiceConfig(),
         managementService.getPartitionService());
     return new AtomicCounterMapProxy(proxy, managementService.getPrimitiveRegistry())
         .connect()
