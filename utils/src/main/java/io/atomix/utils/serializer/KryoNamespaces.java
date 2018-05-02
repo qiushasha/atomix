@@ -92,7 +92,6 @@ public final class KryoNamespaces {
             .register(char[].class)
             .register(String[].class)
             .register(boolean[].class)
-            .register(Object[].class)
             .build("BASIC");
 
     /**

@@ -30,7 +30,7 @@ import static com.google.common.base.MoreObjects.toStringHelper;
  * Document tree primitive type.
  */
 public class DocumentTreeType<V> implements PrimitiveType<DocumentTreeBuilder<V>, DocumentTreeConfig, DocumentTree<V>, ServiceConfig> {
-  private static final String NAME = "document-tree";
+  private static final String NAME = "DOCUMENT_TREE";
 
   /**
    * Returns a new document tree type.
