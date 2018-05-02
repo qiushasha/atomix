@@ -15,14 +15,17 @@
  */
 package io.atomix.core.lock;
 
+import io.atomix.core.lock.impl.DefaultDistributedLockService;
+import io.atomix.core.lock.impl.DistributedLockEvents;
 import io.atomix.core.lock.impl.DistributedLockProxyBuilder;
 import io.atomix.core.lock.impl.DistributedLockResource;
-import io.atomix.core.lock.impl.DistributedLockService;
 import io.atomix.primitive.PrimitiveManagementService;
 import io.atomix.primitive.PrimitiveType;
 import io.atomix.primitive.resource.PrimitiveResource;
 import io.atomix.primitive.service.PrimitiveService;
 import io.atomix.primitive.service.ServiceConfig;
+import io.atomix.utils.serializer.KryoNamespace;
+import io.atomix.utils.serializer.Namespace;
 
 import static com.google.common.base.MoreObjects.toStringHelper;
 
@@ -47,8 +50,16 @@ public class DistributedLockType implements PrimitiveType<DistributedLockBuilder
   }
 
   @Override
+  public Namespace namespace() {
+    return KryoNamespace.builder()
+        .register((KryoNamespace) PrimitiveType.super.namespace())
+        .register(DistributedLockEvents.NAMESPACE)
+        .build();
+  }
+
+  @Override
   public PrimitiveService newService(ServiceConfig config) {
-    return new DistributedLockService(config);
+    return new DefaultDistributedLockService(config);
   }
 
   @Override

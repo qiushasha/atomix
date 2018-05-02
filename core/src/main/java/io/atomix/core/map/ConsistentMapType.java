@@ -65,7 +65,6 @@ public class ConsistentMapType<K, V> implements PrimitiveType<ConsistentMapBuild
     return KryoNamespace.builder()
         .register((KryoNamespace) PrimitiveType.super.namespace())
         .register(ConsistentMapEvents.NAMESPACE)
-        .register(KryoNamespaces.BASIC)
         .nextId(KryoNamespaces.BEGIN_USER_CUSTOM_ID)
         .register(TransactionId.class)
         .register(TransactionLog.class)
