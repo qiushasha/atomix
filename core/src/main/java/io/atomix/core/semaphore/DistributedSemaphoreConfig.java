@@ -21,7 +21,7 @@ import io.atomix.primitive.PrimitiveConfig;
  * Semaphore configuration.
  */
 public class DistributedSemaphoreConfig extends PrimitiveConfig<DistributedSemaphoreConfig> {
-  protected DistributedSemaphoreConfig() {
+  public DistributedSemaphoreConfig() {
     super(DistributedSemaphoreType.instance());
   }
 

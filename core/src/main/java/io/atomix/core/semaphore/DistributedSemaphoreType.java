@@ -15,17 +15,22 @@
  */
 package io.atomix.core.semaphore;
 
+import io.atomix.core.semaphore.impl.DefaultDistributedSemaphoreService;
 import io.atomix.core.semaphore.impl.DistributedSemaphoreProxyBuilder;
-import io.atomix.core.semaphore.impl.DistributedSemaphoreService;
+import io.atomix.core.semaphore.impl.DistributedSemaphoreResource;
 import io.atomix.primitive.PrimitiveManagementService;
 import io.atomix.primitive.PrimitiveType;
 import io.atomix.primitive.resource.PrimitiveResource;
 import io.atomix.primitive.service.PrimitiveService;
+import io.atomix.utils.serializer.KryoNamespace;
+import io.atomix.utils.serializer.KryoNamespaces;
+import io.atomix.utils.serializer.Namespace;
+import io.atomix.utils.time.Version;
 
 import static com.google.common.base.MoreObjects.toStringHelper;
 
 public class DistributedSemaphoreType implements PrimitiveType<DistributedSemaphoreBuilder, DistributedSemaphoreConfig,
-        DistributedSemaphore, DistributedSemaphoreServiceConfig> {
+    DistributedSemaphore, DistributedSemaphoreServiceConfig> {
   private static final String NAME = "semaphore";
 
   public static DistributedSemaphoreType instance() {
@@ -38,8 +43,19 @@ public class DistributedSemaphoreType implements PrimitiveType<DistributedSemaph
   }
 
   @Override
+  public Namespace namespace() {
+    return KryoNamespace.builder()
+        .register((KryoNamespace) PrimitiveType.super.namespace())
+        .register(KryoNamespaces.BASIC)
+        .nextId(KryoNamespaces.BEGIN_USER_CUSTOM_ID)
+        .register(Version.class)
+        .register(QueueStatus.class)
+        .build();
+  }
+
+  @Override
   public PrimitiveService newService(DistributedSemaphoreServiceConfig config) {
-    return new DistributedSemaphoreService(config);
+    return new DefaultDistributedSemaphoreService(config);
   }
 
   @Override
@@ -54,13 +70,13 @@ public class DistributedSemaphoreType implements PrimitiveType<DistributedSemaph
 
   @Override
   public PrimitiveResource newResource(DistributedSemaphore primitive) {
-    throw new UnsupportedOperationException("Not implemented yet");
+    return new DistributedSemaphoreResource(primitive.async());
   }
 
   @Override
   public String toString() {
     return toStringHelper(this)
-            .add("id", id())
-            .toString();
+        .add("id", id())
+        .toString();
   }
 }

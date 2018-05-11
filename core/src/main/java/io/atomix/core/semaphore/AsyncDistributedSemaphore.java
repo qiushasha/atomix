@@ -19,7 +19,6 @@ import io.atomix.primitive.AsyncPrimitive;
 import io.atomix.primitive.DistributedPrimitive;
 import io.atomix.primitive.PrimitiveType;
 import io.atomix.utils.time.Version;
-import io.atomix.utils.time.Versioned;
 
 import java.time.Duration;
 import java.util.Optional;
@@ -81,7 +80,6 @@ public interface AsyncDistributedSemaphore extends AsyncPrimitive {
    */
   CompletableFuture<Optional<Version>> tryAcquire(int permits, Duration timeout);
 
-
   /**
    * Releases a permit.
    *
@@ -102,7 +100,7 @@ public interface AsyncDistributedSemaphore extends AsyncPrimitive {
    *
    * @return a future for available permits
    */
-  CompletableFuture<Versioned<Integer>> availablePermits();
+  CompletableFuture<Integer> availablePermits();
 
   /**
    * Acquires and returns all permits that are immediately available.
@@ -113,7 +111,7 @@ public interface AsyncDistributedSemaphore extends AsyncPrimitive {
    *
    * @return the future complete with number of permits acquired
    */
-  CompletableFuture<Versioned<Integer>> drainPermits();
+  CompletableFuture<Integer> drainPermits();
 
   /**
    * Increases the number of available permits by the indicated
@@ -123,7 +121,7 @@ public interface AsyncDistributedSemaphore extends AsyncPrimitive {
    * @param permits the number of permits to add
    * @return the future complete with available permits after increase
    */
-  CompletableFuture<Versioned<Integer>> increase(int permits);
+  CompletableFuture<Integer> increase(int permits);
 
   /**
    * Shrinks the number of available permits by the indicated reduction.
@@ -133,14 +131,14 @@ public interface AsyncDistributedSemaphore extends AsyncPrimitive {
    * @param permits the number of permits to remove
    * @return the future complete with available permits after increase
    */
-  CompletableFuture<Versioned<Integer>> reduce(int permits);
+  CompletableFuture<Integer> reduce(int permits);
 
   /**
    * Query the waiting queue status.
    *
    * @return the future complete with waiting queue status
    */
-  CompletableFuture<Versioned<QueueStatus>> queueStatus();
+  CompletableFuture<QueueStatus> queueStatus();
 
   @Override
   default DistributedSemaphore sync() {
