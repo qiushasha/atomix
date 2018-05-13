@@ -21,12 +21,25 @@ import io.atomix.primitive.PrimitiveManagementService;
 import io.atomix.primitive.PrimitiveType;
 import io.atomix.primitive.resource.PrimitiveResource;
 import io.atomix.primitive.service.PrimitiveService;
+import io.atomix.utils.serializer.KryoNamespace;
+import io.atomix.utils.serializer.KryoNamespaces;
+import io.atomix.utils.serializer.Namespace;
 
 import static com.google.common.base.MoreObjects.toStringHelper;
 
 public class DistributedSemaphoreType implements PrimitiveType<DistributedSemaphoreBuilder, DistributedSemaphoreConfig,
         DistributedSemaphore, DistributedSemaphoreServiceConfig> {
   private static final String NAME = "semaphore";
+
+  @Override
+  public Namespace namespace() {
+    return KryoNamespace.builder()
+            .register((KryoNamespace) PrimitiveType.super.namespace())
+            .register(KryoNamespaces.BASIC)
+            .nextId(KryoNamespaces.BEGIN_USER_CUSTOM_ID)
+            .register(DistributedSemaphoreServiceConfig.class)
+            .build();
+  }
 
   public static DistributedSemaphoreType instance() {
     return new DistributedSemaphoreType();
