@@ -259,11 +259,11 @@ public class DefaultClusterMembershipService
           localMember.rack(),
           localMember.host(),
           localMember.metadata())));
-    } else if (existingMember.getState() == State.INACTIVE) {
+    } else if (!existingMember.id().equals(localMember.id()) && existingMember.getState() == State.INACTIVE) {
       LOGGER.info("{} - Member activated: {}", localMember.id(), existingMember);
       existingMember.setState(State.ACTIVE);
       post(new ClusterMembershipEvent(ClusterMembershipEvent.Type.MEMBER_ADDED, existingMember));
-    } else if (!existingMember.metadata().equals(member.metadata())) {
+    } else if (!existingMember.id().equals(localMember.id()) && !existingMember.metadata().equals(member.metadata())) {
       member.setState(State.ACTIVE);
       LOGGER.info("{} - Member updated: {}", localMember.id(), member);
       members.put(member.id(), member);
