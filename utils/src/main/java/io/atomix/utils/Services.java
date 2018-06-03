@@ -16,10 +16,10 @@
 package io.atomix.utils;
 
 import io.github.lukehutch.fastclasspathscanner.FastClasspathScanner;
-import io.github.lukehutch.fastclasspathscanner.scanner.ScanResult;
 
+import java.lang.reflect.Modifier;
+import java.util.ArrayList;
 import java.util.Collection;
-import java.util.stream.Collectors;
 
 /**
  * Service utilities.
@@ -53,14 +53,13 @@ public final class Services {
    */
   @SuppressWarnings("unchecked")
   private static <T> Collection<T> loadAllByClass(Class<T> clazz, ClassLoader classLoader) {
-    ScanResult result = scan(classLoader);
-    return result.getClassNameToClassInfo()
-        .get(clazz.getName())
-        .getSubclasses()
-        .stream()
-        .filter(classInfo -> !classInfo.isAbstract())
-        .map(classInfo -> Services.<T>newInstance(classInfo.getClassRef()))
-        .collect(Collectors.toList());
+    final Collection<T> matched = new ArrayList<>();
+    new FastClasspathScanner().addClassLoader(classLoader).matchSubclassesOf(clazz, type -> {
+      if (!Modifier.isAbstract(type.getModifiers())) {
+        matched.add(Services.newInstance(type));
+      }
+    }).scan();
+    return matched;
   }
 
   /**
@@ -73,24 +72,13 @@ public final class Services {
    */
   @SuppressWarnings("unchecked")
   private static <T> Collection<T> loadAllByInterface(Class<T> iface, ClassLoader classLoader) {
-    ScanResult result = scan(classLoader);
-    return result.getClassNameToClassInfo()
-        .get(iface.getName())
-        .getClassesImplementing()
-        .stream()
-        .filter(classInfo -> !classInfo.isAbstract())
-        .map(classInfo -> Services.<T>newInstance(classInfo.getClassRef()))
-        .collect(Collectors.toList());
-  }
-
-  /**
-   * Scans the classpath using the given class loader to load classes.
-   *
-   * @param classLoader the service class loader
-   * @return the scan result
-   */
-  private static ScanResult scan(ClassLoader classLoader) {
-    return new FastClasspathScanner().addClassLoader(classLoader).scan();
+    final Collection<T> matched = new ArrayList<>();
+    new FastClasspathScanner().addClassLoader(classLoader).matchClassesImplementing(iface, type -> {
+      if (!Modifier.isAbstract(type.getModifiers())) {
+        matched.add(Services.newInstance(type));
+      }
+    }).scan();
+    return matched;
   }
 
   /**
